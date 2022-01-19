@@ -27,7 +27,7 @@ public class Main extends Application {
 			BorderPane.setAlignment(b, Pos.CENTER);
 			root.setTop(b);
 			primaryStage.setScene(scene);
-			primaryStage.show(); 
+			primaryStage.show();
 		} catch(Exception e) {
 			e.printStackTrace();
 		}
