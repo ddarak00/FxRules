@@ -21,8 +21,10 @@ public class Main extends Application {
 			primaryStage.setTitle("Rules for Life");
 			
 			
-			TextField b = new TextField("Enter Life Rule");
+			TextField b = new TextField();
 			b.setMaxWidth(900);
+			b.setPromptText("Enter life rule.");
+			b.setFocusTraversable(false);
 			BorderPane.setMargin(b, new Insets(50));
 			BorderPane.setAlignment(b, Pos.CENTER);
 			root.setTop(b);
