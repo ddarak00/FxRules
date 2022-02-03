@@ -8,5 +8,6 @@
 	</classpathentry>
 	<classpathentry kind="con" path="org.eclipse.fx.ide.jdt.core.JAVAFX_CONTAINER"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/JavaFX"/>
+	<classpathentry kind="lib" path="C:/Program Files/Java/sqljdbc_9.4/enu/mssql-jdbc-9.4.1.jre11.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
