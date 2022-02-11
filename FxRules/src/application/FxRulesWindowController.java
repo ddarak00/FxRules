@@ -6,6 +6,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.ResultSetMetaData;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -21,42 +22,100 @@ public class FxRulesWindowController {
 	@FXML
 	private ListView<String> listOfRules;
 	
-	//private ObservableList<String> observableList = FXCollections.observableArrayList();
 	
 	@FXML
 	public void buttonClicked() {
 		String newRule = ruleTextField.getText();
+		ruleTextField.clear();
 		
 		try {
-			String dbCommand = "INSERT INTO Statement VALUES(?)";
+			String dbCommand = "INSERT INTO ruleList VALUES(?,?,?)";
 			PreparedStatement stmt = connection.prepareStatement(dbCommand);
 			
-			/*Statement st = connection.createStatement();
-			st.executeUpdate("INSERT INTO Statement " + 
-	                "VALUES ('" + newRule + "')");
-			st.close();*/
 			stmt.setString(1,newRule);
+			stmt.setString(2,"reason");
+			stmt.setString(3, null);
 			int affectedRows = stmt.executeUpdate();
 			//stmt.close();
 			System.out.println(ruleTextField.getText());
 			
-			/////////////////////////////////
-			String sql = "select * from Statement";
-			PreparedStatement statement = connection.prepareStatement(sql);
-			ResultSet result = statement.executeQuery();
-			//listOfRules.getItems().add(newRule);
-			while(result.next())
-			{
-				System.out.println(result.getString(1));
-				listOfRules.getItems().add(result.getString(1));
-			}
-			////////////////////////////////
+			refreshListView();
 		}
 		catch(SQLException e) {
 			System.out.println("Error making/sending statement");
 			e.printStackTrace();
 		}
-		
+	}
+	
+	public void refreshListView()
+	{
+		try {
+			String sql = "select * from ruleList";
+			PreparedStatement statement = connection.prepareStatement(sql);
+			ResultSet result = statement.executeQuery();
+			listOfRules.getItems().clear();
+			while(result.next())
+			{
+				listOfRules.getItems().add(result.getString(1));
+				System.out.println(result.getString(1));
+				
+			}
+			System.out.println("Listview Refreshed.");
+		}
+		catch(SQLException e) {
+			System.out.println("Error refreshing Listview.");
+			e.printStackTrace();
+		}
+	}
+	
+	@FXML
+	public void deleteButtonClicked() {
+		System.out.println("Delete Button Pushed.");
+		String theRule;
+		ResultSetMetaData rsMetaData = null;
+		if((theRule = listOfRules.getSelectionModel().getSelectedItem()) != null)
+		{			
+			try {
+			//Creating a Statement object
+		      Statement stmt = connection.createStatement();
+		      //Retrieving the data
+		      ResultSet rs = stmt.executeQuery("select * from ruleList");
+		      //Retrieving the ResultSetMetadata object
+		      rsMetaData = rs.getMetaData();
+		      System.out.println("List of column names in the current table: ");
+		      //Retrieving the list of column names
+		      int count = rsMetaData.getColumnCount();
+		      for(int i = 1; i<=count; i++) {
+		         System.out.println(rsMetaData.getColumnName(i));
+		      }
+			}
+			catch(SQLException e) {
+				System.out.println("List Columns failed");
+				e.printStackTrace();
+			}
+///////////////////////////			
+			System.out.println(theRule);
+
+			try
+			{
+				String sql ="DELETE FROM ruleList WHERE theRule= '" + theRule + "'";
+				System.out.println(sql);
+				Statement deleteStatement = connection.createStatement();
+				//int x = deleteStatement.executeUpdate("DELETE FROM nameTable WHERE Name= 'Donato'"); WORKED
+				int x = deleteStatement.executeUpdate(sql);
+				//x.close();
+				refreshListView();
+
+			}
+			catch(SQLException e) {
+				System.out.println("Delete Statement failed");
+				e.printStackTrace();
+			}
+		}
+		else
+		{
+			System.out.println("Nothing Selected");
+		}
 	}
 	
 	public static void connectToDatabase() {
@@ -76,21 +135,6 @@ public class FxRulesWindowController {
 	
 	public void initialize()
 	{
-		try
-		{
-			String sql = "select * from Statement";
-			PreparedStatement statement = connection.prepareStatement(sql);
-			ResultSet result = statement.executeQuery();
-			while(result.next())
-			{
-				listOfRules.getItems().add(result.getString(1));
-				System.out.println(result.getString(1));
-				
-			}
-		}
-		catch(SQLException e) {
-			System.out.println("Error initializing ListView");
-			e.printStackTrace();
-		}
+		refreshListView();
 	}
 }
